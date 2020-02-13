@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>mule-amazon-s3-connector</artifactId>
+    <version>5.3.0</version>
+    <name>Amazon S3 Connector</name>
+
+    <packaging>mule-extension</packaging>
+
+    <parent>
+        <groupId>com.mulesoft.connectors</groupId>
+        <artifactId>mule-connectivity-parent</artifactId>
+        <version>1.2.4</version>
+    </parent>
+
+    <properties>
+        <!-- Property added to comply with a faulty feature on SDK 1.1 which makes the connector fail. -->
+        <extensionsAnnotationProcessor>
+            org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor
+        </extensionsAnnotationProcessor>
+        <!-- Property added to comply with a faulty feature on SDK 1.1 which makes the connector fail. -->
+        <apt.phase>compile</apt.phase>
+        <amazon.sdk.version>1.11.517</amazon.sdk.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>${amazon.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sqs</artifactId>
+            <version>${amazon.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mulesoft.connectors</groupId>
+            <artifactId>aws-connector-commons</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-lang/commons-lang -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20170516</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <!-- Adding this feature because sometimes a Amazon sometimes takes it's time impacting things and
+                     doesn't notify about it, making some tests fail.-->
+                    <rerunFailingTestsCount>2</rerunFailingTestsCount>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <scm>
+        <connection>scm:git:git@github.com:mulesoft/mule-amazon-s3-connector.git</connection>
+        <developerConnection>scm:git:git@github.com:mulesoft/mule-amazon-s3-connector.git</developerConnection>
+        <url>https://github.com/mulesoft/mule-amazon-s3-connector</url>
+        <tag>mule-amazon-s3-connector-5.3.0</tag>
+    </scm>
+    <repositories>
+        <repository>
+            <id>mule-releases</id>
+            <name>Nexus Public Releases</name>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+</project>

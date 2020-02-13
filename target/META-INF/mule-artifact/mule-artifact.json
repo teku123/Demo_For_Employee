@@ -1,0 +1,35 @@
+{
+  "configs": [
+    "Interface_Flow.xml",
+    "Implementation_Flow.xml",
+    "Java_Function_Flow.xml",
+    "Json_Array.xml",
+    "Triggers_Flow.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:sys-api-demo:1.0.1-SNAPSHOT",
+  "minMuleVersion": "4.2.2",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [
+        "com.util"
+      ],
+      "exportedResources": [
+        "api/create-profile-1.raml",
+        "Implementation_Flow.xml",
+        "Interface_Flow.xml",
+        "Java_Function_Flow.xml",
+        "Json_Array.xml",
+        "log4j2.xml",
+        "Triggers_Flow.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

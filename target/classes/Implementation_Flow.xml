@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+       xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       <flow name="join-inputs" doc:id="0f70333a-77e9-46d5-a853-e0cacd4ab934" >
+              <http:listener doc:name="Listener" doc:id="a43dc582-2ed0-4fad-9850-14fba0ea3bb8" config-ref="httpListenerConfig" path="/J_Input"/>
+		<ee:transform doc:name="set_input_variables" doc:id="e2be3623-8c54-4f64-8960-201a3213b891" >
+                     <ee:message >
+                     </ee:message>
+                     <ee:variables >
+                           <ee:set-variable variableName="input1" ><![CDATA[%dw 2.0
+output application/json
+---
+{"employee":[{"id":"A007","first_name":"Jan","last_name":"Doe"},{"id":"A008","first_name":"Ron","last_name":"David"},{"id":"A009","first_name":"Jane","last_name":"Kane"},{"id":"A010","first_name": "Marsh","last_name":"Megan"},{"id":"A011","first_name":"Kelly","last_name":"Mitch"},{"id":"A012", "first_name":"Chris","last_name":"Vaste"}]}
+//{"employee":[[{"id":"A007","first_name":"Jan","last_name":"Doe"}],[{"id":"A008","first_name":"Ron","last_name":"David"}],[{"id":"A009","first_name":"Jane","last_name":"Kane"}],[{"id":"A010","first_name": "Marsh","last_name":"Megan"}],[{"id":"A011","first_name":"Kelly","last_name":"Mitch"}],[{"id":"A012", "first_name":"Chris","last_name":"Vaste"}]]}]]></ee:set-variable>
+                           <ee:set-variable variableName="input2" ><![CDATA[%dw 2.0
+output application/json
+---
+{"scoreBoard":[{"id":"A007","subjects":["Maths","English","Arts","Drawings"],"score":[80,75,89,100]},{"id":"A008","subjects":["Maths","English","Arts","Drawings"],"score":[70,85,69,90]},{"id":" A021","subjects":["Maths","English","Arts","Drawings"],"score":[90,87,77,95]}]}]]></ee:set-variable>
+                     </ee:variables>
+              </ee:transform>
+              <ee:transform doc:name="set payload" doc:id="84daef2e-7ac4-43da-855b-b8adf3f77e85" >
+                     <ee:message >
+                     </ee:message>
+                     <ee:variables >
+                           <ee:set-variable variableName="transformedInput2" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.input2."scoreBoard" map (value,index) -> {
+       "id":(value)."id",
+       "MarksBySubjectWise" : ((value."subjects" map '$':value."score"[$$]) reduce ((val, acc) -> acc ++ val))
+}]]></ee:set-variable>
+                           <ee:set-variable variableName="transformedInput1" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.input1.employee]]></ee:set-variable>
+                     </ee:variables>
+              </ee:transform>
+              <ee:transform doc:name="left_join" doc:id="d7b2bbb1-3360-4713-89ab-e4b85ba57414" >
+                     <ee:message >
+                     </ee:message>
+                     <ee:variables >
+                           <ee:set-variable variableName="leftJoinInput1" ><![CDATA[%dw 2.0
+import * from dw::core::Arrays
+output application/json
+---
+{"certificate" : vars.transformedInput1 map (value,index) -> {
+       (value),
+       (((vars.transformedInput2 filter $."id" == (value."id"))) map ($ - "id"))
+}}]]></ee:set-variable>
+                     </ee:variables>
+              </ee:transform>
+              <logger level="INFO" doc:name="Logger" doc:id="4ecb6678-9cd0-4827-bc15-dae797e9b92a" message="#[vars.leftJoinInput1]"/>
+              <ee:transform doc:name="payload" doc:id="bbeae0dc-6e4a-44d5-b2e7-0d3108f845b5" >
+                     <ee:message >
+                           <ee:set-payload ><![CDATA[%dw 2.0
+//import * from dw::core::Arrays
+output application/json
+---
+vars.leftJoinInput1."certificate" -- (vars.transformedInput1 filter ((value,index) -> !(vars.transformedInput2."id" contains value."id")))]]></ee:set-payload>
+                     </ee:message>
+              </ee:transform>
+              <logger level="INFO" doc:name="Logger" doc:id="c65a542e-fcae-4a1e-9222-16fc90b8a23a" message="#[payload]"/>
+       </flow>
+</mule>

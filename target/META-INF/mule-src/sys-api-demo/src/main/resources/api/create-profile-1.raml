@@ -1,0 +1,21 @@
+#%RAML 1.0
+title: EXP API
+mediaType: application/json
+        
+/create-profile:
+ post:   
+  body:
+     application/json:
+      example: |
+        {
+            "employee": {
+                "id": "A007",
+                "first_name": "Jan",
+                "last_name": "Doe"
+            }
+        }
+  responses:
+    201:
+      body:
+       application/java:
+        example: "Jan Doe employee profile is created in HRMS System"
